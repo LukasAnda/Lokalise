@@ -1,0 +1,10 @@
+build/
+.idea/
+.gradle/
+local.properties
+users.db/
+buildscan.log
+*.hprof
+/.envrc
+
+git-standup-report.txt
