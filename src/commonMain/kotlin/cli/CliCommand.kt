@@ -1,5 +1,6 @@
 package cli
 
+import cli.CliCommand.FileType.*
 import cli.CliConfig.COMMAND_NAME
 import cli.CliConfig.CURRENT_GIT_USER
 import cli.CliConfig.FIND
@@ -7,9 +8,9 @@ import cli.CliConfig.GIT
 import cli.CliConfig.GIT_STANDUP_WHITELIST
 import com.github.ajalt.clikt.completion.completionOption
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.choice
+import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.terminal.Terminal
@@ -20,15 +21,12 @@ import io.readAllText
  * CliKt provides Kotlin Multiplatform command line interface parsing for Kotlin
  * https://ajalt.github.io/clikt/
  *
- * CUSTOMIZE_ME: define your own help messages and arguments here
  */
 class CliCommand : CliktCommand(
     help = """
-       Recall what you did on the last working day ..or be nosy and find what someone else did.
+       Transform your string resources into Android and iOS counterparts.
     """.trimIndent(),
     epilog = """
-        Repositories will be searched in the current directory
-        unless a file `.git-standup-whitelist` is found that contains repository paths.
 
         Examples:
             $COMMAND_NAME -a "John Doe" -w "MON-FRI" -m 3
@@ -39,7 +37,36 @@ class CliCommand : CliktCommand(
         completionOption()
     }
 
+    enum class FileType {
+        Ios, Android, CSV
+    }
+
     lateinit var reportFile: String
+    val inputType by option(
+        "--input-type",
+        "-i",
+        help = "Specify the input type Transkribe should look for. Type Android looks for strings.xml, type csv looks for strings.csv"
+    )
+        .choice("android", "ios", "csv")
+        .enum<FileType>()
+        .default(CSV)
+    val outputTypes by option(
+        "--output-type",
+        "-o",
+        help = "Specify the output type(s) Transkribe should transform to"
+    ).choice("android", "ios", "csv").enum<FileType>().multiple().unique()
+    val inputRoot by option(
+        "--input-root",
+        "-I",
+        help = "Specify input directory/file Transkribe should use"
+    ).default(".")
+    val outputRoot by option(
+        "--output-root",
+        "-O",
+        help = "Specify output directory root Transkribe should use. It will contain folders named after output types requested"
+    ).default(".")
+
+
     val authorOpt: String by option("--author", "-a", help = "Specify author to restrict search to").default("me")
     val branch: String by option(
         "--branch",
@@ -85,14 +112,9 @@ class CliCommand : CliktCommand(
         help = "Display the author date instead of the committer date"
     ).flag()
     val verbose by option("-v", "--verbose", help = "verbose").flag(defaultForHelp = "disabled")
-    val colors by option("--colors", help = "print using colors").flag()
 
     override fun run() {
         if (verbose) println(this)
-        if (colors) {
-            val t = Terminal()
-            t.println("${red("red")} ${white("white")} and ${blue("blue")}")
-        }
     }
 
     fun gitLogCommand(): List<String> {
@@ -138,6 +160,23 @@ class CliCommand : CliktCommand(
         "all" -> ".*"
         "me" -> CURRENT_GIT_USER
         else -> authorOpt
+    }
+
+    // TODO rework finding all files with translations
+    fun findImportFileCommand(): List<String> {
+        val args = mutableListOf<String>()
+
+        args += FIND
+        args += listOf(".")
+        args += "-mindepth"
+        args += "0"
+        args += "-name"
+        args += when (inputType) {
+            Ios -> "Localizable.strings"
+            Android -> "strings.xml"
+            CSV -> "strings.csv"
+        }
+        return args.also { if (verbose) println("$ $it") }
     }
 
 

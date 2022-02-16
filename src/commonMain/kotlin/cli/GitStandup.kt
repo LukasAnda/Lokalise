@@ -4,15 +4,75 @@ import cli.CliConfig.CURRENT_GIT_USER
 import cli.CliConfig.FIND
 import cli.CliConfig.GIT
 import io.*
-import okio.Buffer
 import okio.BufferedSink
+import okio.Path
 import okio.Path.Companion.toPath
 import okio.buffer
 
 /***
  * CUSTOMIZE_ME: this file is all specific to git-standup and can be deleted once understood
  */
-suspend fun runGitStandup(args: Array<String>) {
+suspend fun runTranskribe(args: Array<String>) {
+    var options = ExecuteCommandOptions(directory = ".", abortOnError = true, redirectStderr = true, trim = true)
+
+    //TODO: move section into nodejs actual code ?
+    val jsPackage = "/build/js/packages/transkribe"
+    val pwd = pwd(options)
+    if (pwd.contains(jsPackage)) {
+        options = options.copy(directory = pwd.removeSuffix(jsPackage))
+    }
+
+    FIND = findExecutable(FIND)
+
+    val command = CliCommand()
+    val currentDirectory = pwd(options)
+
+    command.main(args)
+    if (command.help) {
+        println(command.getFormattedHelp())
+        return
+    }
+
+    val inputRootDirectory = when (platform) {
+        Platform.WINDOWS -> "$currentDirectory\\${command.inputRoot}"
+        else -> "$pwd/${command.inputRoot}"
+    }
+
+    val outputRootDirectory = when (platform) {
+        Platform.WINDOWS -> "$currentDirectory\\${command.outputRoot}"
+        else -> "$pwd/${command.outputRoot}"
+    }
+
+    val inputFiles = when (platform) {
+        // TODO fix windows
+        Platform.WINDOWS -> {
+            executeCommandAndCaptureOutput(
+                listOf("where", "-r", ".", "HEAD"),
+                options.copy(abortOnError = false, directory = currentDirectory)
+            )
+                .lines()
+                .filter { it.endsWith(".git\\HEAD") }
+                .joinToString("\n") {
+                    it.substringBeforeLast("\\HEAD")
+                }
+        }
+        else -> executeCommandAndCaptureOutput(
+            command.findImportFileCommand(),
+            options.copy(abortOnError = false, directory = inputRootDirectory)
+        )
+    }
+
+    command.outputTypes.forEach {
+        if(fileSystem.exists("$outputRootDirectory/${it.toString().lowercase()}".toPath())){
+            fileSystem.deleteRecursively("$outputRootDirectory/${it.toString().lowercase()}".toPath())
+        }
+        fileSystem.createDirectory("$outputRootDirectory/${it.toString().lowercase()}".toPath())
+    }
+
+    println(inputFiles.lines())
+}
+
+suspend fun runGitStandup2(args: Array<String>) {
     var options = ExecuteCommandOptions(directory = ".", abortOnError = true, redirectStderr = true, trim = true)
 
     //TODO: move section into nodejs actual code ?
@@ -38,7 +98,7 @@ suspend fun runGitStandup(args: Array<String>) {
         println(command.getFormattedHelp())
         return
     }
-    command.reportFile = when(platform) {
+    command.reportFile = when (platform) {
         Platform.WINDOWS -> "$pwd\\git-standup-report.txt"
         else -> "$pwd/git-standup-report.txt"
     }
@@ -47,7 +107,7 @@ suspend fun runGitStandup(args: Array<String>) {
         fileSystem.delete(command.reportFile.toPath())
     }
 
-    val gitRepositories = when(platform) {
+    val gitRepositories = when (platform) {
         Platform.WINDOWS -> {
             executeCommandAndCaptureOutput(
                 listOf("where", "-r", ".", "HEAD"),
@@ -56,8 +116,8 @@ suspend fun runGitStandup(args: Array<String>) {
                 .lines()
                 .filter { it.endsWith(".git\\HEAD") }
                 .joinToString("\n") {
-                it.substringBeforeLast("\\HEAD")
-            }
+                    it.substringBeforeLast("\\HEAD")
+                }
         }
         else -> executeCommandAndCaptureOutput(
             command.findCommand(),

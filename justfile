@@ -2,15 +2,15 @@
 ## Install with $ brew install just
 run:
     ./gradlew allTests allRun install
-    cd .. && git-standup
+    cd .. && transkribe
 ci:
     ./gradlew runOnGitHub
 github:
-    open https://github.com/jmfayard/kotlin-cli-starter/
+    open https://github.com/LukasAnda/Transkribe/
 issues:
-    open https://github.com/jmfayard/kotlin-cli-starter/issues
+    open https://github.com/LukasAnda/Transkribe/issues
 prs:
-    open https://github.com/jmfayard/kotlin-cli-starter/pulls
+    open https://github.com/LukasAnda/Transkribe/pulls
 urls: github issues prs
     echo "URLs opened"
 install:

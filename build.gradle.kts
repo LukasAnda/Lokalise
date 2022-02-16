@@ -7,22 +7,23 @@ plugins {
     kotlin("plugin.serialization")
     id("com.github.johnrengelman.shadow")
     id("dev.petuska.npm.publish")
+    id("com.louiscad.complete-kotlin") version "1.1.0"
 }
 
 group = "cli"
 version = "0.2.0"
 
-// CUSTOMIZE_ME: the name of your command-line tool goes here
-val PROGRAM = "git-standup"
+val program = "transkribe"
 
 repositories {
+    google()
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
-    testImplementation(Testing.junit.params)
-    testRuntimeOnly(Testing.junit.engine)
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.10")
+    testImplementation(Testing.junit.jupiter.params)
+    testRuntimeOnly(Testing.junit.jupiter.engine)
 }
 
 application {
@@ -60,9 +61,9 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("com.github.ajalt.clikt:clikt:_")
-                implementation("com.github.ajalt.mordant:mordant:_")
-                implementation("com.squareup.okio:okio-multiplatform:_")
+                implementation("com.github.ajalt.clikt:clikt:3.4.0")
+                implementation("com.github.ajalt.mordant:mordant:2.0.0-beta4")
+                implementation("com.squareup.okio:okio-multiplatform:3.0.0-alpha.9")
                 implementation(KotlinX.coroutines.core)
 
                 /// implementation(Ktor.client.core)
@@ -86,8 +87,8 @@ kotlin {
         }
         getByName("jvmTest") {
             dependencies {
-                implementation(Testing.junit.api)
-                implementation(Testing.junit.engine)
+                implementation(Testing.junit.jupiter.api)
+                implementation(Testing.junit.jupiter.engine)
                 implementation(Kotlin.test.junit5)
             }
         }
@@ -153,8 +154,8 @@ kotlin {
 
         from(jvmTarget.compilations.getByName("main").output)
         configurations = mutableListOf(
-            jvmTarget.compilations.getByName("main").compileDependencyFiles as Configuration,
-            jvmTarget.compilations.getByName("main").runtimeDependencyFiles as Configuration
+            jvmTarget.compilations.getByName("main").compileDependencyFiles,
+            jvmTarget.compilations.getByName("main").runtimeDependencyFiles
         )
     }
 }
@@ -174,17 +175,17 @@ tasks.register<Copy>("install") {
     val folder = "build/bin/$targetLowercase/debugExecutable"
     from(folder) {
         include("${rootProject.name}.kexe")
-        rename { PROGRAM }
+        rename { program }
     }
     into(destDir)
     doLast {
-        println("$ cp $folder/${rootProject.name}.kexe $destDir/$PROGRAM")
+        println("$ cp $folder/${rootProject.name}.kexe $destDir/$program")
     }
 }
 
 tasks.register("allRun") {
     group = "run"
-    description = "Run $PROGRAM on the JVM, on Node and natively"
+    description = "Run $program on the JVM, on Node and natively"
     dependsOn("run", "jsNodeRun", "runDebugExecutable$nativeTarget")
 }
 
@@ -214,9 +215,9 @@ npmPublishing {
             readme = file("README.md")
             packageJson {
                 bin = mutableMapOf(
-                    Pair(PROGRAM, "./$PROGRAM")
+                    Pair(program, "./$program")
                 )
-                main = PROGRAM
+                main = program
                 private = false
                 keywords = jsonArray(
                     "kotlin", "git", "bash"
@@ -225,7 +226,7 @@ npmPublishing {
             files { assemblyDir -> // Specifies what files should be packaged. Preconfigured for default publications, yet can be extended if needed
                 from("$assemblyDir/../dir")
                 from("bin") {
-                    include(PROGRAM)
+                    include(program)
                 }
             }
         }
@@ -246,15 +247,15 @@ tasks.register("completions") {
     dependsOn(":install")
     val injected = project.objects.newInstance<Injected>()
     val shells = listOf(
-        Triple("bash", file("completions/git-standup.bash"), "/usr/local/etc/bash_completion.d"),
-        Triple("zsh", file("completions/_git_standup.zsh"), "/usr/local/share/zsh/site-functions"),
-        Triple("fish", file("completions/git-standup.fish"), "/usr/local/share/fish/vendor_completions.d"),
+        Triple("bash", file("completions/transkribe.bash"), "/usr/local/etc/bash_completion.d"),
+        Triple("zsh", file("completions/_transkribe.zsh"), "/usr/local/share/zsh/site-functions"),
+        Triple("fish", file("completions/transkribe.fish"), "/usr/local/share/fish/vendor_completions.d"),
     )
     for ((SHELL, FILE, INSTALL) in shells) {
         actions.add {
             println("Updating   $SHELL completion file at $FILE")
             injected.exec.exec {
-                commandLine("git-standup", "--generate-completion", SHELL)
+                commandLine("transkribe", "--generate-completion", SHELL)
                 standardOutput = FILE.outputStream()
             }
             println("Installing $SHELL completion into $INSTALL")

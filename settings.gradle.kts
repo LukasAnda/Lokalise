@@ -2,13 +2,14 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         //mavenLocal()
+        mavenCentral()
+        google()
         maven("https://s01.oss.sonatype.org/content/repositories/snapshot")
     }
 }
 plugins {
-    id("com.gradle.enterprise") version "3.6.3"
-    id("de.fayard.refreshVersions") version "0.10.1"
-    id("com.louiscad.complete-kotlin") version "1.0.0"
+    id("com.gradle.enterprise") version "3.8.1"
+    id("de.fayard.refreshVersions") version "0.40.1"
 }
 
 // https://dev.to/jmfayard/the-one-gradle-trick-that-supersedes-all-the-others-5bpg
@@ -24,4 +25,4 @@ gradleEnterprise {
 
 }
 
-rootProject.name = "kotlin-cli-starter"
+rootProject.name = "transkribe"

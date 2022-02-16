@@ -1,27 +1,25 @@
 <!-- 
-CUSTOMIZE ME : delete alll the README except the paragraph "Installation"
+CUSTOMIZE ME : delete all the README except the paragraph "Installation"
 In the paragraph installation, make sure to customize the URL of installer.sh
 -->
 
 A starter project to build command-line tools in Kotlin Multiplatform
 
-Contains a re-implementation of a real world CLI tool: [git-standup](https://github.com/kamranahmedse/git-standup)
-
-<img width="1214" alt="jmfayard_kotlin-cli-starter__Life_is_too_short_for_Bash_programming_and_Telegram_and_GitHub_Desktop" src="https://user-images.githubusercontent.com/459464/117193054-b40e9200-ade2-11eb-86a8-ad65a45a82da.png">
+Contains a re-implementation of a real world CLI tool: [transkribe](https://github.com/kamranahmedse/git-standup)
 
 ## Installation
 
 You can install using one of the options listed below
 
-| Source | Command |
-| --- | --- |
-| Node | npm install -g kotlin-cli-starter 
-| Installer | `curl -L https://raw.githubusercontent.com/jmfayard/kotlin-cli-starter/main/installer.sh \| sudo sh` |
-| Tests | `./gradlew allTests` |
-| Kotlin All Platforms | Run `./gradlew allRun` |
-| Kotlin JVM | Run `./gradlew run` |
-| Kotlin Native | Run `./gradlew install` then `$ git standup` |
-| Kotlin Node.JS | Run `./gradlew jsNodeRun` |
+| Source               | Command                                                                                              |
+|----------------------|------------------------------------------------------------------------------------------------------|
+| Node                 | `npm install -g kotlin-cli-starter`                                                                  |
+| Installer            | `curl -L https://raw.githubusercontent.com/jmfayard/kotlin-cli-starter/main/installer.sh \| sudo sh` |
+| Tests                | `./gradlew allTests`                                                                                 |
+| Kotlin All Platforms | `./gradlew allRun`                                                                                   |
+| Kotlin JVM           | `./gradlew run`                                                                                      |
+| Kotlin Native        | `./gradlew install && transkribe`                                                                    |
+| Kotlin Node.JS       | `./gradlew jsNodeRun`                                                                                |
 
 ## Why?
 
@@ -52,7 +50,7 @@ Look at the issues https://github.com/jmfayard/kotlin-cli-starter/issues
 The template
 
 - can be run
-  - with Kotlin/Native via `$ ./gradlew install` and then `git-standup`
+  - with Kotlin/Native via `$ ./gradlew install` and then `transkribe`
   - on the JVM with `$ ./gradlew run`
   - on Node.JS with `$ ./gradlew jsNodeRun`. The package is published on https://www.npmjs.com/package/kotlin-cli-starter
 - has tests that can also be run both
@@ -74,9 +72,9 @@ The template
 
 <img width="1631" alt="kotlin-cli-starter_–_nativeMain_…_Files_kt__kotlin-cli-starter_nativeMain__and_GitHub_Desktop_and_kamranahmedse_git-standup__Recall_what_you_did_on_the_last_working_day__Psst__or_be_nosy_and_find_what_someone_else_in_your_team_did__-_" src="https://user-images.githubusercontent.com/459464/117189924-0baafe80-addf-11eb-84d9-c1e52f3f704d.png">
   
-## The template reimplements `git-standup`
+## The template reimplements `transkribe`
 
-The template reimplements [`git-standup`](https://github.com/kamranahmedse/git-standup) so that you can learn and find inspiration from a real world example.
+The template reimplements [`transkribe`](https://github.com/kamranahmedse/git-standup) so that you can learn and find inspiration from a real world example.
 
 Simply run it in and it will give you the output from the last working day
 
@@ -98,7 +96,7 @@ There is auto-completion to see the options
 
 ```shell
 git standup --help
-Usage: git-standup [OPTIONS]
+Usage: transkribe [OPTIONS]
 
   Recall what you did on the last working day ..or be nosy and find what
   someone else did.
@@ -111,7 +109,7 @@ Options:
                                    include fetches)
   [... and much more options....]
 
-Examples: git-standup -a "John Doe" -w "MON-FRI" -m 3
+Examples: transkribe -a "John Doe" -w "MON-FRI" -m 3
 ```
 
 ## CUSTOMIZE_ME
@@ -134,7 +132,7 @@ Find them with `Edit > File > Find in Files`
 
 ## Built with kotlin-cli-starter
 
-- [git-standup](https://github.com/jmfayard/kotlin-cli-starter)
+- [transkribe](https://github.com/jmfayard/kotlin-cli-starter)
 - [httpie.kt](https://github.com/raychenon/httpie.kt)
 - ...
 
