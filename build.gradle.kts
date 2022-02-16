@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 
@@ -11,7 +12,7 @@ plugins {
 }
 
 group = "cli"
-version = "0.2.0"
+version = "0.2.1"
 
 val program = "transkribe"
 
@@ -52,6 +53,7 @@ kotlin {
     val node = js(LEGACY) {
         nodejs()
         binaries.executable()
+        useCommonJs()
     }
 
     sourceSets {
@@ -118,7 +120,7 @@ kotlin {
         getByName("jsMain") {
             dependencies {
                 implementation("com.squareup.okio:okio-nodefilesystem-js:_")
-                implementation(KotlinX.nodeJs)
+//                implementation(KotlinX.nodeJs)
             }
         }
         getByName("jsTest") {
@@ -135,6 +137,10 @@ kotlin {
                 languageSettings.useExperimentalAnnotation("okio.ExperimentalFileSystem")
             }
         }
+    }
+
+    tasks.named<KotlinJsCompile>("compileKotlinJs").configure {
+        kotlinOptions.moduleKind = "commonjs"
     }
 
     tasks.withType<JavaExec> {
@@ -199,7 +205,8 @@ tasks.register("runOnGitHub") {
 npmPublishing {
     dry = false
     repositories {
-        val token = System.getenv("NPM_AUTH_TOKEN")
+//        val token = System.getenv("NPM_AUTH_TOKEN")
+        val token = "my.token"
         if (token == null) {
             println("No environment variable NPM_AUTH_TOKEN found, using dry-run for publish")
             dry = true

@@ -25,4 +25,4 @@ gradleEnterprise {
 
 }
 
-rootProject.name = "transkribe"
+rootProject.name = "transkribe-cli"
