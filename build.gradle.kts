@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "cli"
-version = "0.2.1"
+version = "0.0.1"
 
 val program = "transkribe"
 
@@ -50,7 +50,7 @@ kotlin {
 
     val jvmTarget = jvm()
 
-    val node = js(LEGACY) {
+    val node = js(IR) {
         nodejs()
         binaries.executable()
         useCommonJs()
@@ -63,8 +63,9 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("com.github.ajalt.clikt:clikt:3.4.0")
-                implementation("com.github.ajalt.mordant:mordant:2.0.0-beta4")
+                implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.4")
+//                implementation("com.github.ajalt.clikt:clikt:3.4.0")
+//                implementation("com.github.ajalt.mordant:mordant:2.0.0-beta4")
                 implementation("com.squareup.okio:okio-multiplatform:3.0.0-alpha.9")
                 implementation(KotlinX.coroutines.core)
 
@@ -206,7 +207,7 @@ npmPublishing {
     dry = false
     repositories {
 //        val token = System.getenv("NPM_AUTH_TOKEN")
-        val token = "my.token"
+        val token = "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"
         if (token == null) {
             println("No environment variable NPM_AUTH_TOKEN found, using dry-run for publish")
             dry = true

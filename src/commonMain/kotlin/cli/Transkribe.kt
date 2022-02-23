@@ -22,53 +22,55 @@ suspend fun runTranskribe(args: Array<String>) {
 
     FIND = findExecutable(FIND)
 
-    val command = CliCommand()
-    val currentDirectory = pwd(options)
+    println("Hello from transkribe")
 
-    command.main(args)
-    if (command.help) {
-        println(command.getFormattedHelp())
-        return
-    }
-
-    val inputRootDirectory = when (platform) {
-        Platform.WINDOWS -> "$currentDirectory\\${command.inputRoot}"
-        else -> "$pwd/${command.inputRoot}"
-    }
-
-    val outputRootDirectory = when (platform) {
-        Platform.WINDOWS -> "$currentDirectory\\${command.outputRoot}"
-        else -> "$pwd/${command.outputRoot}"
-    }
-
-    val inputFiles = when (platform) {
-        // TODO fix windows
-        Platform.WINDOWS -> {
-            executeCommandAndCaptureOutput(
-                listOf("where", "-r", ".", "HEAD"),
-                options.copy(abortOnError = false, directory = currentDirectory)
-            )
-                .lines()
-                .filter { it.endsWith(".git\\HEAD") }
-                .joinToString("\n") {
-                    it.substringBeforeLast("\\HEAD")
-                }
-        }
-        else -> executeCommandAndCaptureOutput(
-            command.findImportFileCommand(),
-            options.copy(abortOnError = false, directory = inputRootDirectory)
-        )
-    }
-
-    command.outputTypes.forEach {
-        if(fileSystem.exists("$outputRootDirectory/${it.toString().lowercase()}".toPath())){
-            fileSystem.deleteRecursively("$outputRootDirectory/${it.toString().lowercase()}".toPath())
-        }
-        fileSystem.createDirectory("$outputRootDirectory/${it.toString().lowercase()}".toPath())
-    }
-
-    println(inputFiles.lines())
-    println(currentDirectory)
+//    val command = CliCommand()
+//    val currentDirectory = pwd(options)
+//
+//    command.main(args)
+//    if (command.help) {
+//        println(command.getFormattedHelp())
+//        return
+//    }
+//
+//    val inputRootDirectory = when (platform) {
+//        Platform.WINDOWS -> "$currentDirectory\\${command.inputRoot}"
+//        else -> "$pwd/${command.inputRoot}"
+//    }
+//
+//    val outputRootDirectory = when (platform) {
+//        Platform.WINDOWS -> "$currentDirectory\\${command.outputRoot}"
+//        else -> "$pwd/${command.outputRoot}"
+//    }
+//
+//    val inputFiles = when (platform) {
+//        // TODO fix windows
+//        Platform.WINDOWS -> {
+//            executeCommandAndCaptureOutput(
+//                listOf("where", "-r", ".", "HEAD"),
+//                options.copy(abortOnError = false, directory = currentDirectory)
+//            )
+//                .lines()
+//                .filter { it.endsWith(".git\\HEAD") }
+//                .joinToString("\n") {
+//                    it.substringBeforeLast("\\HEAD")
+//                }
+//        }
+//        else -> executeCommandAndCaptureOutput(
+//            command.findImportFileCommand(),
+//            options.copy(abortOnError = false, directory = inputRootDirectory)
+//        )
+//    }
+//
+//    command.outputTypes.forEach {
+//        if(fileSystem.exists("$outputRootDirectory/${it.toString().lowercase()}".toPath())){
+//            fileSystem.deleteRecursively("$outputRootDirectory/${it.toString().lowercase()}".toPath())
+//        }
+//        fileSystem.createDirectory("$outputRootDirectory/${it.toString().lowercase()}".toPath())
+//    }
+//
+//    println(inputFiles.lines())
+//    println(currentDirectory)
 }
 
 //suspend fun runGitStandup2(args: Array<String>) {
@@ -134,48 +136,48 @@ suspend fun runTranskribe(args: Array<String>) {
 //}
 
 
-suspend fun findCommitsInRepo(repositoryPath: String, command: CliCommand) {
-    val write: BufferedSink = fileSystem.appendingSink(command.reportFile.toPath()).buffer()
-    fun log(message: String) {
-        when {
-            command.report -> {
-                write.writeUtf8("$message\n")
-            }
-            else -> println(message)
-        }
-    }
-
-    val options =
-        ExecuteCommandOptions(directory = repositoryPath, abortOnError = true, redirectStderr = true, trim = true)
-
-    if (fileIsReadable("$repositoryPath/.git").not()) {
-        if (command.verbose) log("Skipping non-repository with path='$repositoryPath'")
-    }
-    if (command.verbose) {
-        log("findCommitsInRepo($repositoryPath)")
-    }
-    // fetch the latest commits if necessary
-    if (command.fetch) {
-        val fetchCommand = listOf(GIT, "fetch", "--all")
-        if (command.verbose) log(fetchCommand.joinToString(separator = " "))
-        try {
-            executeCommandAndCaptureOutput(fetchCommand, options)
-        } catch (e: Exception) {
-            log("Warning: could not fetch commits from repository $repositoryPath ; error $e")
-        }
-    }
-
-    // history
-    val result = executeCommandAndCaptureOutput(command.gitLogCommand(), options)
-    if (result.isNotBlank()) {
-        log("# $repositoryPath")
-        log(result)
-    } else if (command.silence.not()) {
-        log("# $repositoryPath")
-        log("No commits from ${command.authorName()} during this period")
-    }
-    if (command.verbose) {
-        log("$ " + command.gitLogCommand())
-    }
-    write.close()
-}
+//suspend fun findCommitsInRepo(repositoryPath: String, command: CliCommand) {
+//    val write: BufferedSink = fileSystem.appendingSink(command.reportFile.toPath()).buffer()
+//    fun log(message: String) {
+//        when {
+//            command.report -> {
+//                write.writeUtf8("$message\n")
+//            }
+//            else -> println(message)
+//        }
+//    }
+//
+//    val options =
+//        ExecuteCommandOptions(directory = repositoryPath, abortOnError = true, redirectStderr = true, trim = true)
+//
+//    if (fileIsReadable("$repositoryPath/.git").not()) {
+//        if (command.verbose) log("Skipping non-repository with path='$repositoryPath'")
+//    }
+//    if (command.verbose) {
+//        log("findCommitsInRepo($repositoryPath)")
+//    }
+//    // fetch the latest commits if necessary
+//    if (command.fetch) {
+//        val fetchCommand = listOf(GIT, "fetch", "--all")
+//        if (command.verbose) log(fetchCommand.joinToString(separator = " "))
+//        try {
+//            executeCommandAndCaptureOutput(fetchCommand, options)
+//        } catch (e: Exception) {
+//            log("Warning: could not fetch commits from repository $repositoryPath ; error $e")
+//        }
+//    }
+//
+//    // history
+//    val result = executeCommandAndCaptureOutput(command.gitLogCommand(), options)
+//    if (result.isNotBlank()) {
+//        log("# $repositoryPath")
+//        log(result)
+//    } else if (command.silence.not()) {
+//        log("# $repositoryPath")
+//        log("No commits from ${command.authorName()} during this period")
+//    }
+//    if (command.verbose) {
+//        log("$ " + command.gitLogCommand())
+//    }
+//    write.close()
+//}
