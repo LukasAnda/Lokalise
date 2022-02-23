@@ -6,6 +6,7 @@ import io.*
 import okio.BufferedSink
 import okio.Path.Companion.toPath
 import okio.buffer
+import kotlin.random.Random
 
 /***
  * CUSTOMIZE_ME: this file is all specific to git-standup and can be deleted once understood
@@ -22,7 +23,7 @@ suspend fun runTranskribe(args: Array<String>) {
 
     FIND = findExecutable(FIND)
 
-    println("Hello from transkribe")
+    printLogs()
 
 //    val command = CliCommand()
 //    val currentDirectory = pwd(options)
@@ -135,6 +136,9 @@ suspend fun runTranskribe(args: Array<String>) {
 //    }
 //}
 
+fun printLogs() {
+    println("Hello from transkribe :)")
+}
 
 //suspend fun findCommitsInRepo(repositoryPath: String, command: CliCommand) {
 //    val write: BufferedSink = fileSystem.appendingSink(command.reportFile.toPath()).buffer()

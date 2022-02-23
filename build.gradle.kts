@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 
@@ -12,7 +13,7 @@ plugins {
 }
 
 group = "cli"
-version = "0.0.1"
+version = "0.0.2a"
 
 val program = "transkribe"
 
@@ -52,13 +53,13 @@ kotlin {
 
     val node = js(IR) {
         nodejs()
-        binaries.executable()
+        binaries.library()
         useCommonJs()
     }
 
     sourceSets {
         all {
-            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+            languageSettings.optIn("kotlin.RequiresOptIn")
         }
 
         val commonMain by getting {
@@ -207,7 +208,7 @@ npmPublishing {
     dry = false
     repositories {
 //        val token = System.getenv("NPM_AUTH_TOKEN")
-        val token = "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"
+        val token = "tokeeen"
         if (token == null) {
             println("No environment variable NPM_AUTH_TOKEN found, using dry-run for publish")
             dry = true
